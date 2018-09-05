@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.github.mapper.user.UserMapper">
+	<resultMap id="BaseResultMap" type="com.github.po.user.User">
+		<id column="id" property="id" jdbcType="BIGINT" />
+		<result column="username" property="username" jdbcType="VARCHAR" />
+		<result column="real_name" property="realName" jdbcType="VARCHAR" />
+		<result column="password" property="password" jdbcType="VARCHAR" />
+		<result column="gender" property="gender" jdbcType="TINYINT"
+			typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler" />
+		<result column="created_on" property="createdOn" jdbcType="TIMESTAMP" />
+		<result column="updated_on" property="updatedOn" jdbcType="TIMESTAMP" />
+		<result column="created_by" property="createdBy" jdbcType="BIGINT" />
+		<result column="updated_by" property="updatedBy" jdbcType="BIGINT" />
+
+
+
+	</resultMap>
+	<sql id="Base_Column_List">
+		id, username, password, real_name, gender, created_on, updated_on,
+		created_by,updated_by
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Long">
+		select
+		<include refid="Base_Column_List" />
+		from user
+		where id = #{id,jdbcType=INTEGER}
+	</select>
+
+	<select id="selectByUsername" resultMap="BaseResultMap"
+		parameterType="java.lang.String">
+		select
+		<include refid="Base_Column_List" />
+		from user
+		where username = #{username}
+	</select>
+
+	<select id="selectByUsername_COUNT" resultType="java.lang.Long"
+		parameterType="java.lang.String">
+		select count(1) from user
+		where username = #{username}
+	</select>
+
+	<insert id="insert" parameterType="com.github.po.user.User">
+		insert into user (
+		<include refid="Base_Column_List" />
+		)
+		values (#{id,jdbcType=BIGINT}, #{username,jdbcType=VARCHAR},
+		#{password,jdbcType=VARCHAR},  #{realName,jdbcType=VARCHAR}, 
+		#{gender,typeHandler=org.apache.ibatis.type.EnumOrdinalTypeHandler},
+		#{createdOn,jdbcType=TIMESTAMP}, #{updatedOn,jdbcType=TIMESTAMP},
+		#{createdBy,jdbcType=BIGINT}, #{updatedBy,jdbcType=BIGINT})
+	</insert>
+
+
+	<update id="updateByPrimaryKey" parameterType="com.github.po.user.User">
+		update user
+		set username = #{username,jdbcType=VARCHAR},
+		password = #{password,jdbcType=VARCHAR},
+		real_name = #{realName,jdbcType=VARCHAR},
+		gender = #{gender,typeHandler=org.apache.ibatis.type.EnumOrdinalTypeHandler}
+		where id = #{id,jdbcType=BIGINT}
+	</update>
+
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+		delete from user
+		where id = #{id,jdbcType=BIGINT}
+	</delete>
+	
+	<delete id="deleteByIds" >
+		delete from user
+		WHERE id in (${ids})
+	</delete>
+	
+	
+	
+	<select id="findUser" resultMap="BaseResultMap" parameterType="com.github.po.user.User">
+	  	SELECT 
+		<include refid="Base_Column_List" />
+ 		FROM user 
+	  <where> 
+	    <if test="username != null and username != ''">
+	         username = #{username}
+	    </if> 
+	    <if test="realName != null and realName != ''">
+	        AND real_name like #{realName}
+	    </if>
+	    <if test="gender != null">
+	        AND gender = #{gender , typeHandler=org.apache.ibatis.type.EnumOrdinalTypeHandler}
+	    </if>
+	  </where>
+	  	order by id desc
+	</select>
+	
+
+</mapper>
